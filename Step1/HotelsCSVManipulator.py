@@ -4,7 +4,7 @@ import argparse
 
 
 def convert_df_datetime(hotels_df, col_name):
-    hotels_df[col_name] = pd.to_datetime(hotels_df[col_name], format="%m/%d/%Y %H:%M")
+    hotels_df[col_name] = pd.to_datetime(hotels_df[col_name], format="%m/%d/%Y %H:%M", utc=True)
 
 
 def add_day_diff(hotels_df):

@@ -14,6 +14,10 @@ class AbstractHotelsClassifier:
         pass
 
     @abstractmethod
+    def predict_proba(self, x):
+        pass
+
+    @abstractmethod
     def reset(self):
         pass
 
