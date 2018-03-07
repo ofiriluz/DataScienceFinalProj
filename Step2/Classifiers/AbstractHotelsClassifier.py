@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 
 class AbstractHotelsClassifier:
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
     @abstractmethod
@@ -18,6 +18,14 @@ class AbstractHotelsClassifier:
         pass
 
     @abstractmethod
+    def fit_labelizer(self, x):
+        pass
+
+    @abstractmethod
+    def transform_labels(self, x):
+        pass
+
+    @abstractmethod
     def reset(self):
         pass
 
@@ -27,4 +35,16 @@ class AbstractHotelsClassifier:
 
     @abstractmethod
     def load_model(self, path):
+        pass
+
+    @abstractmethod
+    def get_name(self):
+        pass
+
+    @abstractmethod
+    def get_labelizer(self):
+        pass
+
+    @abstractmethod
+    def get_native_classifier(self):
         pass

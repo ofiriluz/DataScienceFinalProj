@@ -95,4 +95,4 @@ if __name__ == '__main__':
 
     # Write the partitioned CSV to the filesystem (No HDFS, so partitioned on the local computer)
     print('Saving partitioned CSV to ' + args.output_path)
-    price_df.write.csv(args.output_path)
+    price_df.coalesce(1).write.csv(args.output_path, header='true')
