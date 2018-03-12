@@ -97,24 +97,35 @@ def plot_roc_curve_onevsrest(target_y, pred_y):
 
 
 def training_flow(args):
+    # Get the fitting classifier for the args
     factory_singleton = ModelClassifierFactory()
     print('Getting classifier for ' + args.classifier)
     classifier = factory_singleton.create_classifier(args.classifier)(**vars(args))
+
+    # Note that if the one vs rest mode is enabled
+    # The classifier is wrapped with one vs rest classifier
     if args.enable_one_vs_rest:
         print('Using one vs rest wrapper')
         classifier = factory_singleton.create_classifier('OneVsRest')(classifier)
+
+    # Load the CSV and take the needed columns
     hotels_df = pd.read_csv(args.input_csv, encoding="ISO-8859-1")
     hotels_df = hotels_df[COMBINED_LIST]
+
+    # Fit the labelizer and transform the needed columns with split for training and validation
     classifier.fit_labelizer(hotels_df)
     print('Getting training set')
     training_set, validation_set = split_training_test(hotels_df, args.train_size)
     print('Encoding Data')
     labeled_training_set = classifier.transform_labels(training_set)
     labeled_validation_set = classifier.transform_labels(validation_set)
+
+    # Split the data to train and validation
     print('Splitting data')
     labeled_training_x, labeled_training_y = split_training_set(training_set=labeled_training_set)
     labeled_validation_x, labeled_validation_y = split_training_set(training_set=labeled_validation_set)
 
+    # Train and save the model
     classifier.train(labeled_training_x, labeled_training_y)
     print('Saving classifier to ' + args.output_model_folder)
     factory_singleton.save_classifier(classifier, args.output_model_folder)
@@ -126,19 +137,27 @@ def training_flow(args):
 
 
 def predict_flow(args):
+    # Load the saved model and labelizers from the file system
     classifier_folder = args.input_model_folder
     factory_singleton = ModelClassifierFactory()
     print('Getting classifier from folder ' + classifier_folder)
     classifier = factory_singleton.load_classifier(classifier_folder)
+
+    # Read and label the data
     print('Reading CSV')
     hotels_df_to_predict = pd.read_csv(args.input_csv, encoding="ISO-8859-1")
     hotels_df_to_predict = hotels_df_to_predict[FEATURES_LIST]
     print('Labeling CSV')
-    labeled_hotels_df_to_predict = classifier.transform_labels(hotels_df_to_predict)
+    # Note that the copy is required for saving the csv later on due to the labelizer
+    labeled_hotels_df_to_predict = classifier.transform_labels(hotels_df_to_predict.copy())
+
+    # Predict
     print('Trying to predict...')
     predictions = classifier.predict(labeled_hotels_df_to_predict)
     print('Results:')
     print(predictions)
+
+    # Save the results to the csv
     if args.save_predictions_to_csv:
         hotels_df_to_predict[TARGET_CLASS] = predictions
         hotels_df_to_predict.to_csv(args.input_csv)
@@ -186,9 +205,9 @@ if __name__ == '__main__':
                                 type=str,
                                 help='The trained model to try to predict with')
     predict_parser.add_argument('--save_predictions_to_csv',
-                                type=bool,
                                 help='Whether to save the predictions to the input CSV or not',
-                                default=True)
+                                required=False,
+                                action='store_true')
 
     args = parser.parse_args(sys.argv[1:])
 

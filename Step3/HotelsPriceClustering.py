@@ -25,15 +25,23 @@ def create_kmeans_dendogram(input_csv, num_clusters):
     generated_hotels_df = spark.read.csv(
         input_csv, header=True,
         inferSchema=True)
+
     # Limit the clusters to num cols
     num_clusters = min(num_clusters, len(generated_hotels_df.columns[1:]))
+
+    # Assemble the features vector column
     vecAssembler = VectorAssembler(inputCols=generated_hotels_df.columns[1:], outputCol="features")
     vector_df = vecAssembler.transform(generated_hotels_df)
+
+    # Run the BisectingKMeans to find hierarchial clusters
     kmeans = BisectingKMeans().setK(num_clusters).setSeed(42)
     model = kmeans.fit(vector_df)
-    print(model.clusterCenters())
+
+    # Link it to find relations between the clusters
     z = hc.linkage(model.clusterCenters(), method='average', metric='correlation')
-    dendrogram = hc.dendrogram(z)
+
+    # Plot the dendrogram
+    hc.dendrogram(z)
     plt.show()
 
 
@@ -48,15 +56,21 @@ def create_pdist_dendogram(input_csv):
         input_csv, header=True,
         inferSchema=True)
 
+    # Assemble the features vector column
     vecAssembler = VectorAssembler(inputCols=generated_hotels_df.columns[1:], outputCol="features")
     vector_df = vecAssembler.transform(generated_hotels_df)
-    numpvec = np.array(vector_df.select(generated_hotels_df.columns[1:]).collect())
-    numpvec = pdist(numpvec)
-    z = hc.linkage(numpvec, method='average', metric='correlation')
-    dendrogram = hc.dendrogram(z,
-                               labels=np.array([v['Hotel Name']
-                                                for v in
-                                                generated_hotels_df.select('Hotel Name').collect()]))
+
+    # Create distance vector from the dataframe features
+    distvec = pdist(np.array(vector_df.select(generated_hotels_df.columns[1:]).collect()))
+
+    # Find the hierarchy linkage in an average method correlated
+    z = hc.linkage(distvec, method='average', metric='correlation')
+
+    # Plot the dendrogram
+    hc.dendrogram(z,
+                  labels=np.array([v['Hotel Name']
+                                   for v in
+                                   generated_hotels_df.select('Hotel Name').collect()]))
     plt.show()
 
 
