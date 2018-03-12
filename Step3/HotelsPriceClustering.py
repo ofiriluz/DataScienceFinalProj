@@ -26,11 +26,12 @@ def create_kmeans_dendogram(input_csv, num_clusters):
         input_csv, header=True,
         inferSchema=True)
     # Limit the clusters to num cols
-    num_clusters = max(num_clusters, len(generated_hotels_df.columns[1:]))
+    num_clusters = min(num_clusters, len(generated_hotels_df.columns[1:]))
     vecAssembler = VectorAssembler(inputCols=generated_hotels_df.columns[1:], outputCol="features")
     vector_df = vecAssembler.transform(generated_hotels_df)
     kmeans = BisectingKMeans().setK(num_clusters).setSeed(42)
     model = kmeans.fit(vector_df)
+    print(model.clusterCenters())
     z = hc.linkage(model.clusterCenters(), method='average', metric='correlation')
     dendrogram = hc.dendrogram(z)
     plt.show()

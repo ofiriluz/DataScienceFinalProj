@@ -43,7 +43,7 @@ def plot_roc_curve_onevsrest(target_y, pred_y):
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
-    for i in range(4):
+    for i in range(len(DISCOUNT_CODE_CLASSES)):
         fpr[i], tpr[i], _ = roc_curve(target_y[:, i], pred_y[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
@@ -133,11 +133,12 @@ def predict_flow(args):
     print('Reading CSV')
     hotels_df_to_predict = pd.read_csv(args.input_csv, encoding="ISO-8859-1")
     hotels_df_to_predict = hotels_df_to_predict[FEATURES_LIST]
+    print('Labeling CSV')
+    labeled_hotels_df_to_predict = classifier.transform_labels(hotels_df_to_predict)
     print('Trying to predict...')
-    predictions = classifier.predict(hotels_df_to_predict)
+    predictions = classifier.predict(labeled_hotels_df_to_predict)
     print('Results:')
     print(predictions)
-
     if args.save_predictions_to_csv:
         hotels_df_to_predict[TARGET_CLASS] = predictions
         hotels_df_to_predict.to_csv(args.input_csv)
