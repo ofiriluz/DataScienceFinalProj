@@ -8,7 +8,6 @@ DEFAULT_RANDOM_STATE = 42
 
 class DecisionTreeHotelsClassifier(AbstractHotelsClassifier):
     def __init__(self, min_samples_split=40, **kwargs):
-        print(min_samples_split)
         super(AbstractHotelsClassifier).__init__()
         self.tree_model = None
         self.tree_encoders = {}

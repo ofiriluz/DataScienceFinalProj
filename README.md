@@ -11,4 +11,5 @@ Step 3 is implemented using pyspark
 
 Project Members:
 - Ofir Iluz - 203835616
-- Ran Binyamini -
+- Ran Binyamini – 302940978
+- Yael Meloch - 204408645
