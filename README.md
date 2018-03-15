@@ -7,7 +7,7 @@ Each step is implemented separately
 
 Step 1 and 2 are implemented using pandas etc
 
-Step 3 is implemented using pyspark
+Step 3 is implemented using both pandas and pyspark
 
 Project Members:
 - Ofir Iluz - 203835616
