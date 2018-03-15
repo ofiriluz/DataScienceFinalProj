@@ -5,7 +5,8 @@ Step 3 consists of clustering the data from step 1
 
 With addition to different data manipulation to create a new feature set.
 
-This part is implemented using pyspark
+This part is implemented using both pyspark and pandas
+Both sides support the same args and the same executables
 
 The step consists of two executables
 - HotelsPriceDataGenerator
